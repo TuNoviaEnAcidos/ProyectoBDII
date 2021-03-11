@@ -22,6 +22,10 @@ Admin
 CREATE DATABASE Proyecto;
 USE Proyecto;
 
+/*4. Se muestran a continuación el siguiente modelo entidad relación que se creara con sus respectivos atributos. Crear las tablas con Roman.*/
+
+SELECT USER();
+
 CREATE TABLE Representante(
     idRepresentante INT PRIMARY KEY AUTO_INCREMENT,
     Nombre VARCHAR(45),
@@ -90,3 +94,180 @@ CREATE TABLE Ventas(
     FOREIGN KEY(Productos_idProductos)REFERENCES Productos(idProductos) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(Clientes_idClientes)REFERENCES Clientes(idClientes) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY(Factura_idFactura)REFERENCES Factura(idFactura) ON UPDATE CASCADE ON DELETE CASCADE);
+
+/*5. Crear solo 4 de las siguientes tablas auditorias en su base de datos proyecto.*/
+
+/*Auditoria: Clientes (Elias)*/
+CREATE TABLE Auditoria_Clientes(
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    NomAnt VARCHAR(45),
+    aPatAnt VARCHAR(45),
+    aMatAnt VARCHAR(45),
+    RFCAnt VARCHAR(45),
+    DireAnt VARCHAR(45),
+    TelAnt BIGINT,
+    FechaNacAnt DATE,
+    SexoAnt VARCHAR(45),
+    NomNue VARCHAR(45),
+    aPatNue VARCHAR(45),
+    aMatNue VARCHAR(45),
+    RFCNue VARCHAR(45),
+    DireNue VARCHAR(45),
+    TelNue BIGINT,
+    fechaNacNue DATE,
+    SexoNue VARCHAR(45),
+    Usuario VARCHAR(45),
+    Modificado DATETIME,
+    Proceso VARCHAR(45),
+    idClientes INT);
+
+/*Auditoria: Representante (Sammy)*/
+CREATE TABLE Auditoria_Representante(
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    NomAnt VARCHAR(45),
+    aPatAnt VARCHAR(45),
+    TelAnt BIGINT,
+    EmailAnt VARCHAR(45),
+    CargoAnt VARCHAR(45),
+    NomNue VARCHAR(45),
+    aPatNue VARCHAR(45),
+    TelNue BIGINT,
+    EmailNue VARCHAR(45),
+    CargoNue VARCHAR(45),
+    Usuario VARCHAR(45),
+    Modificado DATETIME,
+    Proceso VARCHAR(45),
+    idRepresentante INT);
+
+/*Auditoria: Factura (Alejandro)*/
+CREATE TABLE Auditoria_Factura(
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    idFacturaAnt INT,
+    FechaPagoAnt DATE,
+    TipoPagoAnt VARCHAR(45),
+    idFacturaNue INT,
+    FechaPagoNue DATE,
+    TipoPagoNue VARCHAR(45),
+    Usuario VARCHAR(45),
+    Modificado DATETIME,
+    Proceso VARCHAR(45),
+    idFactura INT);
+
+/*Auditoria: Ventas (Alejandro)*/
+CREATE TABLE Auditoria_Ventas(
+    ID INT PRIMARY KEY AUTO_INCREMENT,
+    idVentasAnt INT,
+    Productos_idProductosAnt INT,
+    Clientes_idClientesAnt INT,
+    Factura_idFacturaAnt INT,
+    MontoAnt DOUBLE,
+    FechaVentaAnt DATE,
+    idVentasNue INT,
+    Productos_idProductosNue INT,
+    Clientes_idClientesNue INT,
+    Factura_idFacturaNue INT,
+    MontoNue DOUBLE,
+    FechaVentaNue DATE,
+    Usuario VARCHAR(45),
+    Modificado DATETIME,
+    Proceso VARCHAR(45),
+    idVentas INT);
+
+/*6. Crear con root los Triggers, para sus 4 tablas que eligieron. (Insertar, actualizar,eliminar). Se crearan 12 triggers en total.*/
+
+exit
+cd/
+cd Program Files\MariaDB 10.5\bin
+mysql -u root -p
+ContraseñaROOT
+USE Proyecto;
+SELECT USER();
+
+/*Triggers: Clientes (Elias)*/
+
+CREATE TRIGGER Insertar_Auditoria_Clientes AFTER INSERT ON Clientes FOR EACH ROW
+INSERT INTO Auditoria_Clientes(NomNue,aPatNue,aMatNue,RFCNue,DireNue,TelNue,FechaNacNue,SexoNue,Usuario,Modificado,Proceso,idClientes)VALUES
+(NEW.Nombre,NEW.aPaterno,NEW.aMaterno,NEW.RFC,NEW.Direccion,NEW.Telefono,NEW.FechaNacimiento,NEW.Sexo,USER(),NOW(),'Agregado',NEW.idClientes);
+
+CREATE TRIGGER Actualizar_Auditoria_Clientes AFTER UPDATE ON Clientes FOR EACH ROW
+INSERT INTO Auditoria_Clientes(NomAnt,aPatAnt,aMatAnt,RFCAnt,DireAnt,TelAnt,FechaNacAnt,SexoAnt,NomNue,aPatNue,aMatNue,RFCNue,DireNue,TelNue,FechaNacNue,SexoNue,Usuario,Modificado,Proceso,idClientes)
+VALUES(OLD.Nombre,OLD.aPaterno,OLD.aMaterno,OLD.RFC,OLD.Direccion,OLD.Telefono,OLD.FechaNacimiento,OLD.Sexo,NEW.Nombre,NEW.aPaterno,NEW.aMaterno,NEW.RFC,NEW.Direccion,NEW.Telefono,NEW.FechaNacimiento,NEW.Sexo,USER(),NOW(),'Actualizado',NEW.idClientes);
+
+CREATE TRIGGER Eliminar_Auditoria_Clientes AFTER DELETE ON Clientes FOR EACH ROW
+INSERT INTO Auditoria_Clientes(NomAnt,aPatAnt,aMatAnt,RFCAnt,DireAnt,TelAnt,FechaNacAnt,SexoAnt,Usuario,Modificado,Proceso,idClientes)VALUES
+(OLD.Nombre,OLD.aPaterno,OLD.aMaterno,OLD.RFC,OLD.Direccion,OLD.Telefono,OLD.FechaNacimiento,OLD.Sexo,USER(),NOW(),'Eliminado',OLD.idClientes);
+
+/*Triggers: Representante (Sammy)*/
+
+CREATE TRIGGER Insertar_Auditoria_Representante AFTER INSERT ON Representante FOR EACH ROW
+INSERT INTO Auditoria_Representante(NomNue,aPatNue,TelNue,EmailNue,CargoNue,Usuario,Modificado,Proceso,idRepresentante)VALUES
+(NEW.Nombre,NEW.aPaterno,NEW.Telefono,NEW.Email,NEW.Cargo,USER(),NOW(),'Agregado',NEW.idRepresentante);
+
+CREATE TRIGGER Actualizar_Auditoria_Representante AFTER UPDATE ON Representante FOR EACH ROW
+INSERT INTO Auditoria_Representante(NomAnt,aPatAnt,TelAnt,EmailAnt,CargoAnt,NomNue,aPatNue,TelNue,EmailNue,CargoNue,Usuario,Modificado,Proceso,idRepresentante)VALUES 
+(OLD.Nombre,OLD.aPaterno,OLD.Telefono,OLD.Email,OLD.Cargo,New.Nombre,New.aPaterno,New.Telefono,New.Email,New.Cargo,USER(),NOW(),'Actualizado',OLD.idRepresentante);
+
+CREATE TRIGGER Eliminar_Auditoria_Representante AFTER DELETE ON Representante FOR EACH ROW
+INSERT INTO Auditoria_Representante(NomAnt,aPatAnt,EmailAnt,CargoAnt,usuario,modificado,proceso,idRepresentante)VALUES
+(OLD.Nombre,OLD.aPaterno,OLD.Telefono,OLD.Email,OLD.Cargo,USER(),NOW(),'Eliminado',OLD.idRepresentante);
+
+/*Triggers: Factura (Alejandro)*/
+
+CREATE TRIGGER Insertar_Auditoria_Factura AFTER INSERT ON Factura FOR EACH ROW
+INSERT INTO Auditoria_Factura(idFacturaNue,FechaPagoNue,TipoPagoNue,Usuario,Modificado,Proceso,idFactura)VALUES
+(NEW.idFactura,NEW.FechaPago,NEW.TipoPago,USER(),NOW(),'Agregado',NEW.idFactura);
+
+CREATE TRIGGER Actualizar_Auditoria_Factura AFTER UPDATE ON Factura FOR EACH ROW
+INSERT INTO Auditoria_Factura(idFacturaAnt,FechaPagoAnt,TipoPagoAnt,idFacturaNue,FechaPagoNue,TipoPagoNue,Usuario,Modificado,Proceso,idFactura)VALUES
+(OLD.idFactura,OLD.FechaPago,OLD.TipoPago,NEW.idFactura,NEW.FechaPago,NEW.TipoPago,USER(),NOW(),'Actualizado',NEW.idFactura);
+
+CREATE TRIGGER Eliminar_Auditoria_Factura AFTER DELETE ON Factura FOR EACH ROW
+INSERT INTO Auditoria_Factura(idFacturaAnt,FechaPagoAnt,TipoPagoAnt,Usuario,Modificado,Proceso,idFactura)VALUES
+(OLD.idFactura,OLD.FechaPago,OLD.TipoPago,USER(),NOW(),'Eliminado',OLD.idFactura);
+
+/*Triggers: Ventas (Alejandro)*/
+
+CREATE TRIGGER Insertar_Auditoria_Ventas AFTER INSERT ON Ventas FOR EACH ROW
+INSERT INTO Auditoria_Ventas(idVentasNue,Productos_idProductosNue,Clientes_idClientesNue,Factura_idFacturaNue,MontoNue,FechaVentaNue,Usuario,Modificado,Proceso,idVentas)VALUES
+(NEW.idVentas,NEW.Productos_idProductos,NEW.Clientes_idClientes,NEW.Factura_idFactura,NEW.Monto,NEW.FechaVenta,USER(),NOW(),'Agregado',NEW.idVentas);
+
+CREATE TRIGGER Actualizar_Auditoria_Ventas AFTER UPDATE ON Ventas FOR EACH ROW
+INSERT INTO Auditoria_Ventas(idVentasAnt,Productos_idProductosAnt,Clientes_idClientesAnt,Factura_idFacturaAnt,MontoAnt,FechaVentaAnt,idVentasNue,Productos_idProductosNue,Clientes_idClientesNue,Factura_idFacturaNue,MontoNue,FechaVentaNue,Usuario,Modificado,Proceso,idVentas)VALUES
+(OLD.idVentas,OLD.Productos_idProductos,OLD.Clientes_idClientes,OLD.Factura_idFactura,OLD.Monto,OLD.FechaVenta,NEW.idVentas,NEW.Productos_idProductos,NEW.Clientes_idClientes,NEW.Factura_idFactura,NEW.Monto,NEW.FechaVenta,USER(),NOW(),'Actualizado',NEW.idVentas);
+
+CREATE TRIGGER Eliminar_Auditoria_Ventas AFTER DELETE ON Ventas FOR EACH ROW
+INSERT INTO Auditoria_Ventas(idVentasAnt,Productos_idProductosAnt,Clientes_idClientesAnt,Factura_idFacturaAnt,MontoAnt,FechaVentaAnt,Usuario,Modificado,Proceso,idVentas)VALUES
+(OLD.idVentas,OLD.Productos_idProductos,OLD.Clientes_idClientes,OLD.Factura_idFactura,OLD.Monto,OLD.FechaVenta,USER(),NOW(),'Eliminado',OLD.idVentas);
+
+/*7. Ahora insertar 2 registros en sus tablas que eligieron, por cada uno de los usuarios creados. (Roman, Daniela, Dorlan).*/
+
+/*Insercion de Roman*/
+exit
+cd/
+cd Program Files\MariaDB 10.5\bin
+mysql -u Roman -p
+Admin
+USE Proyecto;
+
+/*Insercion de Daniela*/
+exit
+cd/
+cd Program Files\MariaDB 10.5\bin
+mysql -u Daniela -p
+Admin
+USE Proyecto;
+
+/*Insercion de Dorian*/
+exit
+cd/
+cd Program Files\MariaDB 10.5\bin
+mysql -u Dorian -p
+Admin
+USE Proyecto;
+
+/*8. Mostrar las tablas de auditoria para ver que se ejecutó el trigger de insertar en sus tablas que eligieron, para ver que los usuarios agregaron 2 registros por cada tabla.*/
+
+SELECT * FROM Auditoria_Factura;
+SELECT * FROM Auditoria_Representante;
+SELECT * FROM Auditoria_Clientes;
+SELECT * FROM Auditoria_Ventas;

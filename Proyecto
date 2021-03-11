@@ -1,0 +1,92 @@
+/*Proyecto Primer Parcial BD-II*/
+
+/*1. La portada que contenga su nombre. El proyecto será de máximo 4 integrantes.*/
+
+/*2. Crear 3 usuarios llamados: Roman, Daniela y Dorlan. Todos son Súper Usuarios.*/
+
+CREATE USER Roman@localhost IDENTIFIED BY 'Admin';
+CREATE USER Daniela@localhost IDENTIFIED BY 'Admin';
+CREATE USER Dorian@localhost IDENTIFIED BY 'Admin';
+GRANT ALL PRIVILEGES ON *.* TO Roman@localhost WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO Daniela@localhost WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO Dorian@localhost WITH GRANT OPTION;
+
+/*3. Crear una Base de datos llamada proyecto con el usuario Roman.*/
+
+exit
+cd/
+cd Program Files\MariaDB 10.5\bin
+mysql -u Roman -p
+Admin
+
+CREATE DATABASE Proyecto;
+USE Proyecto;
+
+CREATE TABLE Representante(
+    idRepresentante INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(45),
+    aPaterno VARCHAR(45),
+    Telefono BIGINT,
+    Email VARCHAR(45),
+    Cargo VARCHAR(45));
+
+CREATE TABLE Empresa(
+    idEmpresa INT PRIMARY KEY AUTO_INCREMENT,
+    Representante_idRepresentante INT,
+    Nombre VARCHAR(45),
+    Pais VARCHAR(45),
+    Direccion VARCHAR(45),
+    Telefono BIGINT,
+    Correo VARCHAR(45),
+    Horario VARCHAR(45),
+    FOREIGN KEY(Representante_idRepresentante)REFERENCES Representante(idRepresentante) ON UPDATE CASCADE ON DELETE CASCADE);
+
+CREATE TABLE Proveedor(
+    idProveedor INT PRIMARY KEY AUTO_INCREMENT,
+    Empresa_idEmpresa INT,
+    Nombre VARCHAR(45),
+    aPaterno VARCHAR(45),
+    Cargo VARCHAR(45),
+    RFC VARCHAR(45),
+    Direccion VARCHAR(45),
+    Celular BIGINT,
+    Sexo VARCHAR(45),
+    Email VARCHAR(45),
+    FOREIGN KEY(Empresa_idEmpresa)REFERENCES Empresa(idEmpresa) ON UPDATE CASCADE ON DELETE CASCADE);
+
+CREATE TABLE Productos(
+    idProductos INT PRIMARY KEY AUTO_INCREMENT,
+    Proveedor_idProveedor INT,
+    Nombre VARCHAR(45),
+    Marca VARCHAR(45),
+    Precio DOUBLE,
+    Cantidad INT,
+    FechaCaducidad DATE,
+    FOREIGN KEY(Proveedor_idProveedor)REFERENCES Proveedor(idProveedor) ON UPDATE CASCADE ON DELETE CASCADE);
+
+CREATE TABLE Clientes(
+    idClientes INT PRIMARY KEY AUTO_INCREMENT,
+    Nombre VARCHAR(45),
+    aPaterno VARCHAR(45),
+    aMaterno VARCHAR(45),
+    RFC VARCHAR(45),
+    Direccion VARCHAR(45),
+    Telefono BIGINT,
+    FechaNacimiento DATE,
+    Sexo VARCHAR(45));
+
+CREATE TABLE Factura(
+    idFactura INT PRIMARY KEY AUTO_INCREMENT,
+    FechaPago DATE,
+    TipoPago VARCHAR(45));
+
+CREATE TABLE Ventas(
+    idVentas INT PRIMARY KEY AUTO_INCREMENT,
+    Productos_idProductos INT,
+    Clientes_idClientes INT,
+    Factura_idFactura INT,
+    Monto DOUBLE,
+    FechaVenta DATE,
+    FOREIGN KEY(Productos_idProductos)REFERENCES Productos(idProductos) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(Clientes_idClientes)REFERENCES Clientes(idClientes) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY(Factura_idFactura)REFERENCES Factura(idFactura) ON UPDATE CASCADE ON DELETE CASCADE);
